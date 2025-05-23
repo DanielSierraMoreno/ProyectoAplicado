@@ -9,7 +9,7 @@ public class NewBehaviourScript : MonoBehaviour
     
     public float energia;
     public float velRecuperacionEn;
-    public Slider Energ;
+    public Slider Energ, vida;
     public float walkSpeed;
     public float walkSpeedFixed;
     public float runSpeed;
@@ -20,6 +20,7 @@ public class NewBehaviourScript : MonoBehaviour
     float lastPosX;
     float lastPosY;
 
+    public int currentHeal = 100;
     public float force;
     public bool jumping;
     public bool attacking;
@@ -119,6 +120,10 @@ public class NewBehaviourScript : MonoBehaviour
     public float endBlock;
 
     public float delayLastAttack;
+
+    bool healing = false;
+    public GameObject healEffect;
+    bool canHeal = true;
     // Start is called before the first frame update
     void Start()
     {
@@ -149,7 +154,9 @@ public class NewBehaviourScript : MonoBehaviour
         enemies = GameObject.FindGameObjectsWithTag("Enemy");
         currentScroll = 0;
         enemyFix = false;
-        currentComboAttack = 0;
+		anim.SetBool("FixedEnemy", false);
+
+		currentComboAttack = 0;
         currentCombo = ComboAtaques.agua;
         move = new Vector3();
         lastPosY = Input.mousePosition.x;
@@ -220,42 +227,43 @@ public class NewBehaviourScript : MonoBehaviour
     }
     void WalkAllDir()
     {
-        switch (movementDirection)
-        {
-            case 0:
-                anim.CrossFadeInFixedTime("WalkUpLeft", 0.2f);
+        anim.CrossFade("WalkBlendTree", 0.1f);
+		//switch (movementDirection)
+		//{
+		//    case 0:
+		//        anim.CrossFadeInFixedTime("WalkUpLeft", 0.2f);
 
-                break;
-            case 1:
-                anim.CrossFadeInFixedTime("WalkUp", 0.2f);
+		//        break;
+		//    case 1:
+		//        anim.CrossFadeInFixedTime("WalkUp", 0.2f);
 
-                break;
-            case 2:
-                anim.CrossFadeInFixedTime("WalkUpRight", 0.2f);
+		//        break;
+		//    case 2:
+		//        anim.CrossFadeInFixedTime("WalkUpRight", 0.2f);
 
-                break;
-            case 3:
-                anim.CrossFadeInFixedTime("WalkLeft", 0.2f);
+		//        break;
+		//    case 3:
+		//        anim.CrossFadeInFixedTime("WalkLeft", 0.2f);
 
-                break;
-            case 5:
-                anim.CrossFadeInFixedTime("WalkRight", 0.2f);
+		//        break;
+		//    case 5:
+		//        anim.CrossFadeInFixedTime("WalkRight", 0.2f);
 
-                break;
-            case 6:
-                anim.CrossFadeInFixedTime("WalkDownLeft", 0.2f);
+		//        break;
+		//    case 6:
+		//        anim.CrossFadeInFixedTime("WalkDownLeft", 0.2f);
 
-                break;
-            case 7:
-                anim.CrossFadeInFixedTime("WalkDown", 0.2f);
+		//        break;
+		//    case 7:
+		//        anim.CrossFadeInFixedTime("WalkDown", 0.2f);
 
-                break;
-            case 8:
-                anim.CrossFadeInFixedTime("WalkDownRight", 0.2f);
+		//        break;
+		//    case 8:
+		//        anim.CrossFadeInFixedTime("WalkDownRight", 0.2f);
 
-                break;
-        }
-    }
+		//        break;
+		//}
+	}
     void RunAllDir()
     {
         switch (movementDirection)
@@ -310,7 +318,7 @@ public class NewBehaviourScript : MonoBehaviour
                         this.transform.GetChild(0).GetChild(0).transform.localPosition += new Vector3(controller.leftStick.ReadValue().x, 0, controller.leftStick.ReadValue().y).normalized;
                         dir = this.transform.GetChild(0).GetChild(0).transform.position - this.transform.position;
                         this.transform.GetChild(0).GetChild(0).transform.localPosition = new Vector3(0, 0, 0);
-                        move = dir * walkSpeed * Time.deltaTime;
+                        move = dir * walkSpeed * Time.deltaTime * controller.leftStick.ReadValue().magnitude;
                         changeWalk();
 
                     }
@@ -320,7 +328,7 @@ public class NewBehaviourScript : MonoBehaviour
                         this.transform.GetChild(0).GetChild(0).transform.localPosition += new Vector3(controller.leftStick.ReadValue().x, 0, controller.leftStick.ReadValue().y).normalized;
                         dir = this.transform.GetChild(0).GetChild(0).transform.position - this.transform.position;
                         this.transform.GetChild(0).GetChild(0).transform.localPosition = new Vector3(0, 0, 0);
-                        move = dir * walkSpeed * Time.deltaTime*0.35f;
+                        move = dir * walkSpeed * Time.deltaTime * controller.leftStick.ReadValue().magnitude;
                         changeWalk();
 
                     }
@@ -339,7 +347,7 @@ public class NewBehaviourScript : MonoBehaviour
                         this.transform.GetChild(0).GetChild(0).transform.localPosition += new Vector3(controller.leftStick.ReadValue().x, 0, controller.leftStick.ReadValue().y).normalized;
                         dir = this.transform.GetChild(0).GetChild(0).transform.position - this.transform.position;
                         this.transform.GetChild(0).GetChild(0).transform.localPosition = new Vector3(0, 0, 0);
-                        move = dir * walkSpeedFixed * Time.deltaTime*0.75f;
+                        move = dir * walkSpeedFixed * Time.deltaTime*0.75f * controller.leftStick.ReadValue().magnitude;
                     }
                     else
                     {
@@ -347,7 +355,7 @@ public class NewBehaviourScript : MonoBehaviour
                         this.transform.GetChild(0).GetChild(0).transform.localPosition += new Vector3(controller.leftStick.ReadValue().x, 0, controller.leftStick.ReadValue().y).normalized;
                         dir = this.transform.GetChild(0).GetChild(0).transform.position - this.transform.position;
                         this.transform.GetChild(0).GetChild(0).transform.localPosition = new Vector3(0, 0, 0);
-                        move = dir * walkSpeedFixed * Time.deltaTime;
+                        move = dir * walkSpeedFixed * Time.deltaTime * controller.leftStick.ReadValue().magnitude;
                     }
                     //this.transform.LookAt(fixedEnemyY);
                     //camera.transform.LookAt(fixedEnemyY);
@@ -435,59 +443,15 @@ public class NewBehaviourScript : MonoBehaviour
     void DashAllDir()
     {
         Vector3 dir = new Vector3();
-        switch (movementDirection)
-        {
-            case 1:
-                anim.CrossFadeInFixedTime("DashUp", 0.2f);
 
-                camera.transform.GetChild(1).localPosition -= new Vector3(controller.leftStick.ReadValue().x, 0, controller.leftStick.ReadValue().y).normalized;
-                dir = this.transform.position - (camera.transform.GetChild(1).position);
-                camera.transform.GetChild(1).localPosition = new Vector3(0, 0, 0); 
-                break;
-            case 3:
-                anim.CrossFadeInFixedTime("DashLeft", 0.2f);
-                camera.transform.GetChild(1).localPosition -= new Vector3(controller.leftStick.ReadValue().x, 0, controller.leftStick.ReadValue().y).normalized;
-                dir = this.transform.position - (camera.transform.GetChild(1).position);
-                camera.transform.GetChild(1).localPosition = new Vector3(0, 0, 0);
-                break;
-            case 0:
-                anim.CrossFadeInFixedTime("DashLeft", 0.2f);
-                camera.transform.GetChild(1).localPosition -= new Vector3(controller.leftStick.ReadValue().x, 0, controller.leftStick.ReadValue().y).normalized;
-                dir = this.transform.position - (camera.transform.GetChild(1).position);
-                camera.transform.GetChild(1).localPosition = new Vector3(0, 0, 0);
-                break;
-            case 6:
-                anim.CrossFadeInFixedTime("DashLeft", 0.2f);
-                camera.transform.GetChild(1).localPosition -= new Vector3(controller.leftStick.ReadValue().x, 0, controller.leftStick.ReadValue().y).normalized;
-                dir = this.transform.position - (camera.transform.GetChild(1).position);
-                camera.transform.GetChild(1).localPosition = new Vector3(0, 0, 0);
-                break;
-            case 2:
-                anim.CrossFadeInFixedTime("DashRight", 0.2f);
-                camera.transform.GetChild(1).localPosition -= new Vector3(controller.leftStick.ReadValue().x, 0, controller.leftStick.ReadValue().y).normalized;
-                dir = this.transform.position - (camera.transform.GetChild(1).position);
-                camera.transform.GetChild(1).localPosition = new Vector3(0, 0, 0);
-                break;
-            case 5:
-                anim.CrossFadeInFixedTime("DashRight", 0.2f);
-                camera.transform.GetChild(1).localPosition -= new Vector3(controller.leftStick.ReadValue().x, 0, controller.leftStick.ReadValue().y).normalized;
-                dir = this.transform.position - (camera.transform.GetChild(1).position);
-                camera.transform.GetChild(1).localPosition = new Vector3(0, 0, 0);
-                break;
-            case 8:
-                anim.CrossFadeInFixedTime("DashRight", 0.2f);
-                camera.transform.GetChild(1).localPosition -= new Vector3(controller.leftStick.ReadValue().x, 0, controller.leftStick.ReadValue().y).normalized;
-                dir = this.transform.position - (camera.transform.GetChild(1).position);
-                camera.transform.GetChild(1).localPosition = new Vector3(0, 0, 0);
-                break;
-            case 7:
-                anim.CrossFadeInFixedTime("DashDown", 0.2f);
-                camera.transform.GetChild(1).localPosition -= new Vector3(controller.leftStick.ReadValue().x, 0, controller.leftStick.ReadValue().y).normalized;
-                dir = this.transform.position - (camera.transform.GetChild(1).position);
-                camera.transform.GetChild(1).localPosition = new Vector3(0, 0, 0);
-                break;
-        }
-        this.transform.GetComponent<Rigidbody>().AddForce(dir.normalized * Time.fixedDeltaTime * DashForce, ForceMode.Impulse);
+        camera.transform.GetChild(1).localPosition -= new Vector3(controller.leftStick.ReadValue().x, 0, controller.leftStick.ReadValue().y).normalized;
+        dir = this.transform.position - (camera.transform.GetChild(1).position);
+        camera.transform.GetChild(1).localPosition = new Vector3(0, 0, 0); 
+
+      
+		anim.CrossFadeInFixedTime("DashBlendTree", 0.2f);
+
+		this.transform.GetComponent<Rigidbody>().AddForce(dir.normalized * Time.fixedDeltaTime * DashForce, ForceMode.Impulse);
 
     }
     void Dash()
@@ -600,17 +564,17 @@ public class NewBehaviourScript : MonoBehaviour
         if (walkVelAnimation && controller.leftStick.ReadValue().magnitude > 0.25f && controller.leftStick.ReadValue().magnitude < 0.5f)
         {
             walkVelAnimation = false;
-            anim.CrossFadeInFixedTime("WalkLento", 0.2f);
+            anim.CrossFadeInFixedTime("NormalWalkBlendTree", 0.2f);
 
         }
         else if(!walkVelAnimation && controller.leftStick.ReadValue().magnitude >= 0.5f)
         {
             walkVelAnimation = true;
-            anim.CrossFadeInFixedTime("Walk", 0.2f);
+			anim.CrossFadeInFixedTime("NormalWalkBlendTree", 0.2f);
 
-        }
+		}
 
-    }
+	}
     void CloseShield()
     {
         if(!block)
@@ -631,8 +595,43 @@ public class NewBehaviourScript : MonoBehaviour
     }
     // Update is called once per frame
 
+    void ReturnHeal()
+    {
+		healing = false;
+        returnNormal();
+	}
 
-    public float smooth;
+    void Heal()
+    {
+        AddHeal(20);
+
+	}
+	void HealDelay()
+	{
+        canHeal = true;
+        healEffect.SetActive(false);
+	}
+	void GetDamage()
+    {
+		AddHeal(-20);
+
+	}
+	void AddHeal(int value)
+	{
+        currentHeal += value;
+
+        if(currentHeal <= 0)
+        {
+
+        }
+
+		if (currentHeal > 100)
+		{
+			currentHeal = 100;
+		}
+	}
+
+	public float smooth;
     void Update()
     {
         if (controller == null)
@@ -675,9 +674,24 @@ public class NewBehaviourScript : MonoBehaviour
 				}
 			}
 		}
+		vida.value = currentHeal;
 
 
 
+        if(controller.xButton.wasPressedThisFrame && canHeal)
+        {
+            canHeal = false;
+			healEffect.SetActive(true); 
+			Invoke(nameof(Heal), 0.25f);
+			Invoke(nameof(HealDelay), 2);
+
+			healing = true;
+			anim.CrossFadeInFixedTime("Heal", 0.2f);
+            Invoke(nameof(ReturnHeal), 0.8f);
+		}
+
+		if (healing)
+			return;
 
 		if (controller.leftShoulder.wasPressedThisFrame && !block && !jumping && !attacking && !dash)
         {            
@@ -818,8 +832,9 @@ public class NewBehaviourScript : MonoBehaviour
         if(currentEnemy == null && enemyFix)
         {
             direccionAtaques.transform.rotation = new Quaternion();
+			anim.SetBool("FixedEnemy", false);
 
-            enemyFix = false;
+			enemyFix = false;
             if(!attacking)
             {
                 anim.speed = 1;
@@ -828,9 +843,13 @@ public class NewBehaviourScript : MonoBehaviour
 
         }
 
+		anim.SetFloat("Speed", controller.leftStick.ReadValue().magnitude);
         if (enemyFix)
         {
-            fixedEnemyY = currentEnemy.transform.position;
+			anim.SetFloat("X", controller.leftStick.ReadValue().x);
+			anim.SetFloat("Y", controller.leftStick.ReadValue().y);
+
+			fixedEnemyY = currentEnemy.transform.position;
             fixedEnemyX = currentEnemy.transform.position;
 
 
@@ -869,6 +888,9 @@ public class NewBehaviourScript : MonoBehaviour
 			}
             else
             {
+                anim.StopRecording();
+
+
                 this.transform.LookAt(fixedEnemyY);
 				if (fixedEnemyY != null)
 				{
@@ -948,6 +970,7 @@ public class NewBehaviourScript : MonoBehaviour
                     fixedEnemyX = enemies[i].transform.position;
                     currentEnemy = enemies[i];
                     enemyFix = true;
+                    anim.SetBool("FixedEnemy", true);
                     fixedEnemyY = new Vector3(fixedEnemyY.x,this.transform.position.y, fixedEnemyY.z);
                     value = Vector3.Dot(camera.transform.forward, camera.transform.position - enemies[i].transform.position);
                 }
@@ -985,8 +1008,9 @@ public class NewBehaviourScript : MonoBehaviour
         else if (controller.rightStickButton.wasPressedThisFrame && enemyFix && !block && !dash)
         {
             direccionAtaques.transform.rotation = new Quaternion();
+			anim.SetBool("FixedEnemy", false);
 
-            enemyFix = false;
+			enemyFix = false;
             anim.speed = 1;
             returnNormal();
         }
