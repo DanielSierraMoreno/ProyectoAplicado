@@ -1,0 +1,145 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a679865d5e1ef9a4d8a78e38b63e4b98, type: 3}
+  m_Name: Basico2
+  m_EditorClassIdentifier: 
+  combo: 0
+  attacks:
+  - ataque: 0.3
+    delay: 0.4
+    attacking: 0
+    effects: Sword Slash 3
+    cuts: 00000000
+    effectDelay: 0.15
+    name: Diagonal1
+    animationSpeed: 1
+    force: 500
+    delayForce: 0
+    col: 0
+    Pesado: 0
+    transition: 0.2
+    curvaDeVelocidad:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    consumoEnergia: 15
+    effectTransformPos: {x: 0, y: 0.78, z: 0}
+    effectTransformRot: {x: 0, y: 0, z: 0.9899003, w: -0.14176519}
+  - ataque: 0.5
+    delay: 0.8
+    attacking: 0
+    effects: Sword Slash 3 (1)
+    cuts: 05000000
+    effectDelay: 0.35
+    name: Slide
+    animationSpeed: 1
+    force: 1500
+    delayForce: 0.3
+    col: 0
+    Pesado: 0
+    transition: 0.2
+    curvaDeVelocidad:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    consumoEnergia: 15
+    effectTransformPos: {x: 0, y: 0.6, z: 0}
+    effectTransformRot: {x: 0, y: 0, z: 0.0015707957, w: 0.99999875}
+  - ataque: 1.5
+    delay: 2
+    attacking: 0
+    effects: Sword Slash 6
+    cuts: 0300000004000000
+    effectDelay: 0.5
+    name: Special1
+    animationSpeed: 1
+    force: 1000
+    delayForce: 0.2
+    col: 1
+    Pesado: 0
+    transition: 0.2
+    curvaDeVelocidad:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.018378219
+        value: 0.00018612295
+        inSlope: 0.030709995
+        outSlope: 0.030709995
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0.48582238
+      - serializedVersion: 3
+        time: 0.9088518
+        value: 0.21036041
+        inSlope: 0.65726227
+        outSlope: 0.65726227
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.2629879
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1.0656382
+        value: 0.97669536
+        inSlope: 4.887765
+        outSlope: 4.887765
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    consumoEnergia: 15
+    effectTransformPos: {x: 0.26, y: 0.9000001, z: 0}
+    effectTransformRot: {x: 0, y: 0, z: 0.43365914, w: -0.90107703}

@@ -1,0 +1,181 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a679865d5e1ef9a4d8a78e38b63e4b98, type: 3}
+  m_Name: Fuerte1
+  m_EditorClassIdentifier: 
+  combo: 1
+  attacks:
+  - ataque: 0.5
+    delay: 0.25
+    attacking: 0
+    effects: Sword Slash 3 (1)
+    cuts: 0000000000000000
+    effectDelay: 0.4
+    name: Horizontal1
+    animationSpeed: 1
+    force: 1000
+    delayForce: 0.2
+    col: 0
+    Pesado: 1
+    transition: 0.15
+    curvaDeVelocidad:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    consumoEnergia: 25
+    effectTransformPos: {x: 0, y: 0.9000001, z: 0}
+    effectTransformRot: {x: -0.028047098, y: 0.055338454, z: -0.17966032, w: -0.98177046}
+  - ataque: 0.9
+    delay: 0.25
+    attacking: 0
+    effects: Sword Slash 3 (1)
+    cuts: 0000000000000000
+    effectDelay: 0.85
+    name: Horizontal1
+    animationSpeed: 1
+    force: 2000
+    delayForce: 0.75
+    col: 0
+    Pesado: 1
+    transition: 0.1
+    curvaDeVelocidad:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.033332825
+        value: 0.47232056
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1.9271173
+        value: 0.962173
+        inSlope: 1.1718035
+        outSlope: 1.1718035
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.19439198
+        outWeight: 0.03830927
+      - serializedVersion: 3
+        time: 2.5710564
+        value: 2.8641183
+        inSlope: -0.0071299155
+        outSlope: -0.0071299155
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 4
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    consumoEnergia: 25
+    effectTransformPos: {x: 0, y: 0.8899999, z: 0}
+    effectTransformRot: {x: 0.028047094, y: -0.055338513, z: 0.1796603, w: 0.98177046}
+  - ataque: 1.75
+    delay: 0.25
+    attacking: 0
+    effects: Sword Slash 3 (1)
+    cuts: 0000000000000000
+    effectDelay: 1.25
+    name: Horizontal1
+    animationSpeed: 1
+    force: 3000
+    delayForce: 1.1
+    col: 0
+    Pesado: 1
+    transition: 0
+    curvaDeVelocidad:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.016735077
+        value: 0.6920166
+        inSlope: -1.4745818
+        outSlope: 0.11498188
+        tangentMode: 1
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 1
+      - serializedVersion: 3
+        time: 1.0794525
+        value: 0.54486
+        inSlope: -0.22801979
+        outSlope: -0.48581132
+        tangentMode: 1
+        weightedMode: 0
+        inWeight: 0.52446544
+        outWeight: 0.28943714
+      - serializedVersion: 3
+        time: 2.7318788
+        value: 0.34696066
+        inSlope: 0.1865867
+        outSlope: 0.21252546
+        tangentMode: 1
+        weightedMode: 0
+        inWeight: 0.34554416
+        outWeight: 0.90286034
+      - serializedVersion: 3
+        time: 3.551876
+        value: 1.710264
+        inSlope: -0.0071299155
+        outSlope: -0.0071299155
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 4
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    consumoEnergia: 25
+    effectTransformPos: {x: 0, y: 0.8899999, z: 0}
+    effectTransformRot: {x: 0.028047094, y: -0.055338513, z: 0.1796603, w: 0.98177046}

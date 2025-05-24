@@ -11,6 +11,8 @@ TagManager:
   - Animal
   - Water
   - Enemy
+  - Damage
+  - Reflect
   layers:
   - Default
   - TransparentFX

@@ -2,9 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class NewBehaviourScript : MonoBehaviour
+public class Player : MonoBehaviour
 {
     
     public float energia;
@@ -41,20 +42,25 @@ public class NewBehaviourScript : MonoBehaviour
     public enum ComboAtaques { agua, fuego , special1,special2,Special3, Slide, Realista1};
 
     public int currentScroll;
-    [System.Serializable]
+
+    public GameObject effects;
+	public GameObject cuts;
+	public GameObject collisions;
+
+	[System.Serializable]
     public struct Ataques
     {
         public float ataque;
         public float delay;
         public bool attacking;
-        public GameObject effects;
-        public GameObject[] cuts;
+        public string effects;
+        public int[] cuts;
         public float effectDelay;
         public string name;
         public float animationSpeed;
         public float force;
         public float delayForce;
-        public CollisionesArma col;
+        public int col;
         public int Pesado;
         public float transition;
         public AnimationCurve curvaDeVelocidad;
@@ -71,13 +77,12 @@ public class NewBehaviourScript : MonoBehaviour
 
     }
     [SerializeField]
-    public ListaAtaques[] attack;
     float lastMoveValue;
-    ListaAtaques currentAttack;
+	public AtaqueSO currentAttack;
 
-	public ComboAtaques currentCombo;
-	public ComboAtaques currentComboDebil;
-	public ComboAtaques currentComboFuerte;
+	public AtaqueSO currentCombo;
+	public AtaqueSO ComboFuerte;
+	public AtaqueSO ComboDebil;
 
 	int currentComboAttack;
     public bool enemyFix;
@@ -116,7 +121,7 @@ public class NewBehaviourScript : MonoBehaviour
     public GameObject LanzarEffectos;
     bool correr;
     float alturaAlEmpezarSaltar;
-    bool block;
+    public bool block;
     public float endBlock;
 
     public float delayLastAttack;
@@ -124,8 +129,14 @@ public class NewBehaviourScript : MonoBehaviour
     bool healing = false;
     public GameObject healEffect;
     bool canHeal = true;
-    // Start is called before the first frame update
-    void Start()
+    bool hit = false;
+    bool dead = false;
+    float damageTimer = 0;
+    public GameObject reflectEffect;
+	public GameObject hitEffect;
+
+	// Start is called before the first frame update
+	void Start()
     {
         block = false;
         BButtonStartTimePressed = 0;
@@ -157,31 +168,16 @@ public class NewBehaviourScript : MonoBehaviour
 		anim.SetBool("FixedEnemy", false);
 
 		currentComboAttack = 0;
-        currentCombo = ComboAtaques.agua;
         move = new Vector3();
         lastPosY = Input.mousePosition.x;
         lastPosX = Input.mousePosition.y;
 
         jumping = false;
         attacking = false;
-        for (int i = 0; i < attack.Length; i++)
-        {
-            if (attack[i].combo == currentCombo)
-            {
-                currentAttack = attack[i];
-                break;
-            }
-        }
 
-        for(int i = 1; i < attack.Length; i++)
-        {
-            for (int e = 1; e < attack[i].attacks.Length; e++)
-            {
-                attack[i].attacks[e].effectTransformPos = attack[i].attacks[e].effects.transform.localPosition;
-                attack[i].attacks[e].effectTransformRot = attack[i].attacks[e].effects.transform.localRotation;
+        currentAttack = currentCombo;
 
-            }
-        }
+
     }
     IEnumerator rotate(float y,float x)
     {
@@ -193,22 +189,47 @@ public class NewBehaviourScript : MonoBehaviour
         if((a < 80 && x > 0) || (a > 5 && x < 0))
         camera.transform.GetChild(0).GetChild(0).Rotate(new Vector3(x, 0, 0) * Time.deltaTime * CameraRotatSpeed);
     }
-    void QuitarEfecto()
+    GameObject GetEffectByName(string name)
     {
-        currentAttack.attacks[currentComboAttack].effects.transform.SetParent(LanzarEffectos.transform);
+        for(int i = 0; i < effects.transform.childCount; i++)
+        {
+			if(effects.transform.GetChild(i).name == name)
+            {
+                return effects.transform.GetChild(i).gameObject;
 
+			}
+
+		}
+        return null;
+    }
+	void DevolverEfecto()
+	{
+		LanzarEffectos.transform.GetChild(0).SetParent(GuardarEffectos.transform);
+	}
+	void QuitarColision()
+    {
+        for(int i = 0; i < collisions.transform.childCount; i++)
+        {
+            collisions.transform.GetChild(i).gameObject.SetActive(false);
+
+        }
+        
     }
     IEnumerator EfectoAtaque(GameObject effect, float delay,GameObject[] plane,CollisionesArma col)
     {
         if(effect != null)
         {
-        Invoke("QuitarEfecto", currentAttack.attacks[currentComboAttack].ataque-0.01f);
+			//Invoke("DevolverEfecto", currentAttack.attacks[currentComboAttack].delay);
+
+
 
         yield return new WaitForSeconds(delay);
 
-        
-        effect.transform.SetParent(GuardarEffectos.transform);
-        effect.transform.localPosition = currentAttack.attacks[currentComboAttack].effectTransformPos;
+		col.gameObject.SetActive(true);
+			Invoke("QuitarColision", 0.1f);
+
+			//effect.transform.SetParent(GuardarEffectos.transform);
+			effect.transform.localPosition = currentAttack.attacks[currentComboAttack].effectTransformPos;
         effect.transform.localRotation = currentAttack.attacks[currentComboAttack].effectTransformRot;
 
         effect.GetComponent<ParticleSystem>().Play();
@@ -216,8 +237,9 @@ public class NewBehaviourScript : MonoBehaviour
         }
 
         yield return new WaitForSeconds(0.15f);
+		//effect.transform.SetParent(GuardarEffectos.transform);
 
-        for(int i = 0; i < plane.Length;i++)
+		for (int i = 0; i < plane.Length;i++)
         {
 
             plane[i].GetComponent<DynamicMeshCutter.PlaneBehaviour>().Cut(col.GetObjects());
@@ -450,7 +472,7 @@ public class NewBehaviourScript : MonoBehaviour
 
       
 		anim.CrossFadeInFixedTime("DashBlendTree", 0.2f);
-
+        this.transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
 		this.transform.GetComponent<Rigidbody>().AddForce(dir.normalized * Time.fixedDeltaTime * DashForce, ForceMode.Impulse);
 
     }
@@ -472,7 +494,8 @@ public class NewBehaviourScript : MonoBehaviour
             if (!enemyFix)
             {
                 anim.CrossFadeInFixedTime("Dash", 0.1f);
-                this.transform.GetComponent<Rigidbody>().AddForce(this.transform.forward * Time.fixedDeltaTime * DashForce, ForceMode.Impulse);
+				this.transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
+				this.transform.GetComponent<Rigidbody>().AddForce(this.transform.forward * Time.fixedDeltaTime * DashForce, ForceMode.Impulse);
                 Invoke("SalirDash", tiempoDash);
 
             }
@@ -613,8 +636,10 @@ public class NewBehaviourScript : MonoBehaviour
 	}
 	void GetDamage()
     {
+        damageTimer = Time.time;
+        anim.CrossFade("Hit", 0f);
 		AddHeal(-20);
-
+		
 	}
 	void AddHeal(int value)
 	{
@@ -622,8 +647,10 @@ public class NewBehaviourScript : MonoBehaviour
 
         if(currentHeal <= 0)
         {
-
-        }
+			anim.CrossFade("Dead", 0.1f);
+            dead = true;
+            hit = false;
+		}
 
 		if (currentHeal > 100)
 		{
@@ -649,32 +676,43 @@ public class NewBehaviourScript : MonoBehaviour
             return;
 
         }
+		vida.value = currentHeal;
 
-        if(controller.rightTrigger.wasPressedThisFrame && !attacking)
+        if(dead)
         {
-            currentCombo = currentComboDebil;
-			for (int i = 0; i < attack.Length; i++)
+            if((Time.time - damageTimer) > 3)
+            {
+                SceneManager.LoadScene(0);
+            }
+
+            return;
+        }
+
+		if (hit)
+		{
+			if ((Time.time - damageTimer) > 1)
 			{
-				if (attack[i].combo == currentCombo)
-				{
-					currentAttack = attack[i];
-					break;
-				}
+                hit = false;
+				returnNormal();
+
 			}
+
+			return;
+		}
+
+
+		if (controller.rightTrigger.wasPressedThisFrame && !attacking)
+        {
+            currentCombo = ComboFuerte;
+            currentAttack = currentCombo;
+
 		}
         else if(controller.rightShoulder.wasPressedThisFrame && !attacking)
 		{
-			currentCombo = currentComboFuerte;
-			for (int i = 0; i < attack.Length; i++)
-			{
-				if (attack[i].combo == currentCombo)
-				{
-					currentAttack = attack[i];
-					break;
-				}
-			}
+			currentCombo = ComboDebil;
+			currentAttack = currentCombo;
+
 		}
-		vida.value = currentHeal;
 
 
 
@@ -1173,19 +1211,23 @@ public class NewBehaviourScript : MonoBehaviour
             attacking = true;
             currentComboAttack = 0;
 
-            for (int i = 0; i < attack.Length;i++)
-            {
-                if(attack[i].combo == currentCombo)
-                {
-                    currentAttack = attack[i];
-                    break;
-                }
-            }
+
+			currentAttack = currentCombo;
 
 
-            currentAttack.attacks[currentComboAttack].attacking = true;
+			currentAttack.attacks[currentComboAttack].attacking = true;
             Invoke("addAttackForce", currentAttack.attacks[currentComboAttack].delayForce);
-            StartCoroutine(EfectoAtaque(currentAttack.attacks[currentComboAttack].effects, currentAttack.attacks[currentComboAttack].effectDelay, currentAttack.attacks[currentComboAttack].cuts, currentAttack.attacks[currentComboAttack].col));
+
+            GameObject[] planeCuts = new GameObject[currentAttack.attacks[currentComboAttack].cuts.Length];
+
+            for(int i = 0; i < currentAttack.attacks[currentComboAttack].cuts.Length; i++)
+            {
+                planeCuts[i] = cuts.transform.GetChild(currentAttack.attacks[currentComboAttack].cuts[i]).gameObject;
+
+			}
+
+
+            StartCoroutine(EfectoAtaque(GetEffectByName(currentAttack.attacks[currentComboAttack].effects), currentAttack.attacks[currentComboAttack].effectDelay, planeCuts, collisions.transform.GetChild(currentAttack.attacks[currentComboAttack].col).GetComponent<CollisionesArma>()));
             
             anim.speed = currentAttack.attacks[currentComboAttack].animationSpeed;
             anim.CrossFadeInFixedTime(currentAttack.attacks[currentComboAttack].name, 0.2f);
@@ -1216,9 +1258,18 @@ public class NewBehaviourScript : MonoBehaviour
                             currentComboAttack++;
                             Invoke("addAttackForce", currentAttack.attacks[currentComboAttack].delayForce);
 
-                            //effects[0].transform.localRotation = new Quaternion();
-                            //effects[0].transform.Rotate(new Vector3(0, 0, rotation2));
-                            StartCoroutine(EfectoAtaque(currentAttack.attacks[currentComboAttack].effects, currentAttack.attacks[currentComboAttack].effectDelay, currentAttack.attacks[currentComboAttack].cuts, currentAttack.attacks[currentComboAttack].col));
+							//effects[0].transform.localRotation = new Quaternion();
+							//effects[0].transform.Rotate(new Vector3(0, 0, rotation2));
+
+							GameObject[] planeCuts = new GameObject[currentAttack.attacks[currentComboAttack].cuts.Length];
+
+							for (int i = 0; i < currentAttack.attacks[currentComboAttack].cuts.Length; i++)
+							{
+								planeCuts[i] = cuts.transform.GetChild(currentAttack.attacks[currentComboAttack].cuts[i]).gameObject;
+
+							}
+
+							StartCoroutine(EfectoAtaque(GetEffectByName(currentAttack.attacks[currentComboAttack].effects), currentAttack.attacks[currentComboAttack].effectDelay, planeCuts, collisions.transform.GetChild(currentAttack.attacks[currentComboAttack].col).GetComponent<CollisionesArma>()));
                             anim.speed = currentAttack.attacks[currentComboAttack].animationSpeed;
                             anim.CrossFadeInFixedTime(currentAttack.attacks[currentComboAttack].name, currentAttack.attacks[currentComboAttack-1].transition);
 
@@ -1353,4 +1404,32 @@ public class NewBehaviourScript : MonoBehaviour
 
 
     }
+    
+
+	private void OnTriggerEnter(Collider other)
+	{
+		if(other.CompareTag("Reflect"))
+        {
+            if(block)
+            {
+                other.GetComponentInParent<Enemy>().SetStun();
+				reflectEffect.SetActive(true);
+			}
+        }
+        else if (other.CompareTag("Damage"))
+        {
+            if (!hit && other.GetComponentInParent<Enemy>().states != Enemy.States.STUN && !dash)
+            {
+				    hitEffect.SetActive(true);
+
+					GetDamage();
+                    hit = true;
+            }
+
+            
+
+            
+		}
+	}
+
 }
