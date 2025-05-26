@@ -92,7 +92,7 @@ public class Player : MonoBehaviour
     float damageTimer = 0;
     public GameObject reflectEffect;
 	public GameObject hitEffect;
-
+    public bool changingWeapon = false;
 	// Start is called before the first frame update
 	void Start()
     {
@@ -581,6 +581,7 @@ public class Player : MonoBehaviour
         }
 		vida.value = currentHeal;
 
+
         if(dead)
         {
             if((Time.time - damageTimer) > 3)
@@ -603,6 +604,8 @@ public class Player : MonoBehaviour
 			return;
 		}
 
+        if (changingWeapon)
+            return;
 
         if(controller.xButton.wasPressedThisFrame && canHeal)
         {
@@ -1198,7 +1201,7 @@ public class Player : MonoBehaviour
     
     public bool CheckIfCanAttack()
     {
-        return !jumping && !attacking && !dash && energia > 0 && !block && (Time.time - delayLastAttack) > 0.5f;
+        return !jumping && !attacking && !dash && energia > 0 && !block && (Time.time - delayLastAttack) > 0.5f && !changingWeapon && !healing;
 
 	}
 
@@ -1214,6 +1217,16 @@ public class Player : MonoBehaviour
         }
         else if (other.CompareTag("Damage"))
         {
+            if(other.GetComponentInParent<Enemy>() == null)
+            {
+				hitEffect.SetActive(true);
+
+				GetDamage();
+				hit = true;
+                return;
+			}
+
+
             if (!hit && other.GetComponentInParent<Enemy>().states != Enemy.States.STUN && !dash)
             {
 				    hitEffect.SetActive(true);
@@ -1222,9 +1235,7 @@ public class Player : MonoBehaviour
                     hit = true;
             }
 
-            
-
-            
+    
 		}
 	}
 

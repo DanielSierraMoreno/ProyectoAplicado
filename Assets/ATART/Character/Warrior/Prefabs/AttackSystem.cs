@@ -49,6 +49,9 @@ public class AttackSystem : MonoBehaviour
 	public AtaqueSO ComboFuerte;
 	public AtaqueSO ComboDebil;
 
+	public AtaqueSO ComboFuerteNoEquipado;
+	public AtaqueSO ComboDebilNoEquipado;
+
 	int currentComboAttack;
 
 	// Start is called before the first frame update
@@ -62,7 +65,15 @@ public class AttackSystem : MonoBehaviour
 
 	// Update is called once per frame
 	void Update()
-    {
+	{
+
+		if (player.controller.yButton.wasPressedThisFrame && player.CheckIfCanAttack())
+		{
+			player.changingWeapon = true;
+			player.anim.CrossFadeInFixedTime("ChangeWeapon", 0.2f);
+		}
+
+		
 		if (player.controller.rightTrigger.wasPressedThisFrame && !player.attacking)
 		{
 			currentCombo = ComboFuerte;
