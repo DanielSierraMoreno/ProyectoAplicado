@@ -52,8 +52,8 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
     consumoEnergia: 25
-    effectTransformPos: {x: 0, y: 0.9000001, z: 0}
-    effectTransformRot: {x: -0.028047098, y: 0.055338454, z: -0.17966032, w: -0.98177046}
+    effectTransformPos: {x: 0, y: 0.72, z: 0}
+    effectTransformRot: {x: 5.0772364e-29, y: -4.349043e-19, z: -1.1674375e-10, w: 1}
   - ataque: 0.9
     delay: 0.25
     attacking: 0
@@ -110,8 +110,8 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
     consumoEnergia: 25
-    effectTransformPos: {x: 0, y: 0.8899999, z: 0}
-    effectTransformRot: {x: 0.028047094, y: -0.055338513, z: 0.1796603, w: 0.98177046}
+    effectTransformPos: {x: 0, y: 0.72, z: 0}
+    effectTransformRot: {x: -9.313226e-10, y: 0, z: 0, w: 1}
   - ataque: 1.75
     delay: 0.25
     attacking: 0
@@ -177,5 +177,5 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
     consumoEnergia: 25
-    effectTransformPos: {x: 0, y: 0.8899999, z: 0}
-    effectTransformRot: {x: 0.028047094, y: -0.055338513, z: 0.1796603, w: 0.98177046}
+    effectTransformPos: {x: 0, y: 0.72, z: 0}
+    effectTransformRot: {x: -9.313226e-10, y: 0, z: 0, w: 1}

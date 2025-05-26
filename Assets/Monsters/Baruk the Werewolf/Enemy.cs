@@ -12,7 +12,7 @@ public class Enemy : MonoBehaviour
     public float moveSpeed;
 	public float ditanceBetweenEnemiesForce;
 
-	public enum States { WALK, IDLE, ATTACK, DEATH, STUN, HIT}
+	public enum States { WALK, IDLE, ATTACK, DEATH, STUN, HIT, PATROL}
 
     public States states = States.IDLE;
 	int maxHealth = 200;
@@ -23,8 +23,14 @@ public class Enemy : MonoBehaviour
 	List<Enemy> otherEnemies;
 
 	public GameObject hitEffect;
-    // Start is called before the first frame update
-    void Start()
+
+	public List<Transform> patrolPoints;
+	Transform currentPoint;
+
+	public float patrolDistance = 12;
+
+	// Start is called before the first frame update
+	void Start()
     {
         player = FindObjectOfType<Player>();
         anim.CrossFadeInFixedTime("Idle",0.2f);
@@ -45,26 +51,63 @@ public class Enemy : MonoBehaviour
             case States.IDLE:
                 if ((Time.time - timer) > 2)
                 {
-                    if (Vector3.Distance(this.transform.position, player.transform.position) > 2)
+                    if (Vector3.Distance(this.transform.position, player.transform.position) > 2 && Vector3.Distance(this.transform.position, player.transform.position) < patrolDistance)
                     {
                         states = States.WALK;
 						anim.CrossFadeInFixedTime("Walk", 0.2f);
 
 					}
+					else if(Vector3.Distance(this.transform.position, player.transform.position) >= patrolDistance)
+					{
+						states = States.PATROL;
+						anim.CrossFadeInFixedTime("Walk", 0.2f);
+
+						Transform newPoint = currentPoint;
+						while (newPoint == currentPoint)
+						{
+							int rand = Random.Range(0, patrolPoints.Count);
+
+							newPoint = patrolPoints[rand];
+						}
+						currentPoint = newPoint;
+					}
                     else
                     {
-						states = States.ATTACK;
-						anim.CrossFadeInFixedTime("Attack", 0.2f);
-                        timer = Time.time;
+						int rand = Random.Range(0, 3);
+
+						if (rand == 0)
+						{
+							states = States.ATTACK;
+							anim.CrossFadeInFixedTime("Attack", 0.2f);
+							timer = Time.time;
+						}
+						else
+						{
+							states = States.ATTACK;
+							anim.CrossFadeInFixedTime("Attack2", 0.2f);
+							timer = Time.time;
+						}
 					}
 				}
                 break;
 			case States.WALK:
 				if (Vector3.Distance(this.transform.position, player.transform.position) <= 2)
 				{
-					states = States.ATTACK;
-					anim.CrossFadeInFixedTime("Attack", 0.2f);
-					timer = Time.time;
+					int rand = Random.Range(0, 3);
+
+					if(rand == 0)
+					{
+						states = States.ATTACK;
+						anim.CrossFadeInFixedTime("Attack", 0.2f);
+						timer = Time.time;
+					}
+					else
+					{
+						states = States.ATTACK;
+						anim.CrossFadeInFixedTime("Attack2", 0.2f);
+						timer = Time.time;
+					}
+
 				}
                 Vector3 target = new Vector3(player.transform.position.x, this.transform.position.y, player.transform.position.z);
 
@@ -109,6 +152,29 @@ public class Enemy : MonoBehaviour
 				{
 					states = States.IDLE;
 					anim.CrossFadeInFixedTime("Idle", 0.2f);
+				}
+				break;
+			case States.PATROL:
+				if (Vector3.Distance(this.transform.position, player.transform.position) > 2 && Vector3.Distance(this.transform.position, player.transform.position) < patrolDistance)
+				{
+					states = States.WALK;
+					anim.CrossFadeInFixedTime("Walk", 0.2f);
+
+				}
+				else
+				{
+					Vector3 targetPatrol = new Vector3(currentPoint.transform.position.x, this.transform.position.y, currentPoint.transform.position.z);
+
+					this.transform.position -= (this.transform.position - targetPatrol).normalized * moveSpeed * Time.timeScale;
+					this.transform.LookAt(targetPatrol);
+
+					if (Vector3.Distance(this.transform.position, targetPatrol) < 0.5f)
+					{
+						states = States.IDLE;
+						anim.CrossFadeInFixedTime("Idle", 0.2f);
+						timer = Time.time;
+
+					}
 				}
 				break;
 			case States.DEATH:
