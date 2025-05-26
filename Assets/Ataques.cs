@@ -4,7 +4,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "NuevoAtaque", menuName = "Ataques/AtaqueSO")]
 public class AtaqueSO : ScriptableObject
 {
-	public Player.ComboAtaques combo;
-	public Player.Ataques[] attacks;
+	public AttackSystem.ComboAtaques combo;
+	public AttackSystem.Ataques[] attacks;
 
 }

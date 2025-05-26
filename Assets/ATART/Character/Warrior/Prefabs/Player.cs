@@ -7,7 +7,6 @@ using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
-    
     public float energia;
     public float velRecuperacionEn;
     public Slider Energ, vida;
@@ -30,7 +29,7 @@ public class Player : MonoBehaviour
     public float tocarSuelo;
     public float caer;
     public float acabarAtacar;
-    float attackStartTime;
+    public float attackStartTime;
     float timeAtJump;
 
     public GameObject camera;
@@ -39,52 +38,11 @@ public class Player : MonoBehaviour
 
     public float gravity;
     public int combos;
-    public enum ComboAtaques { agua, fuego , special1,special2,Special3, Slide, Realista1};
 
     public int currentScroll;
 
-    public GameObject effects;
-	public GameObject cuts;
-	public GameObject collisions;
-
-	[System.Serializable]
-    public struct Ataques
-    {
-        public float ataque;
-        public float delay;
-        public bool attacking;
-        public string effects;
-        public int[] cuts;
-        public float effectDelay;
-        public string name;
-        public float animationSpeed;
-        public float force;
-        public float delayForce;
-        public int col;
-        public int Pesado;
-        public float transition;
-        public AnimationCurve curvaDeVelocidad;
-        public float consumoEnergia;
-        public Vector3 effectTransformPos;
-        public Quaternion effectTransformRot;
-
-    }
-    [System.Serializable]
-    public struct ListaAtaques
-    {
-        public ComboAtaques combo;
-        public Ataques[] attacks;
-
-    }
-    [SerializeField]
     float lastMoveValue;
-	public AtaqueSO currentAttack;
 
-	public AtaqueSO currentCombo;
-	public AtaqueSO ComboFuerte;
-	public AtaqueSO ComboDebil;
-
-	int currentComboAttack;
     public bool enemyFix;
     public GameObject[] enemies;
     Vector3 fixedEnemyY;
@@ -93,8 +51,8 @@ public class Player : MonoBehaviour
     int enemyFixed;
     public Animator anim;
     public bool enAire;
-    float timeAttack;
-    Gamepad controller;
+    public float timeAttack;
+    public Gamepad controller;
     public bool dash;
     public float tiempoDash;
     public float DashForce;
@@ -167,16 +125,12 @@ public class Player : MonoBehaviour
         enemyFix = false;
 		anim.SetBool("FixedEnemy", false);
 
-		currentComboAttack = 0;
         move = new Vector3();
         lastPosY = Input.mousePosition.x;
         lastPosX = Input.mousePosition.y;
 
         jumping = false;
         attacking = false;
-
-        currentAttack = currentCombo;
-
 
     }
     IEnumerator rotate(float y,float x)
@@ -189,64 +143,13 @@ public class Player : MonoBehaviour
         if((a < 80 && x > 0) || (a > 5 && x < 0))
         camera.transform.GetChild(0).GetChild(0).Rotate(new Vector3(x, 0, 0) * Time.deltaTime * CameraRotatSpeed);
     }
-    GameObject GetEffectByName(string name)
-    {
-        for(int i = 0; i < effects.transform.childCount; i++)
-        {
-			if(effects.transform.GetChild(i).name == name)
-            {
-                return effects.transform.GetChild(i).gameObject;
-
-			}
-
-		}
-        return null;
-    }
+    
 	void DevolverEfecto()
 	{
 		LanzarEffectos.transform.GetChild(0).SetParent(GuardarEffectos.transform);
 	}
-	void QuitarColision()
-    {
-        for(int i = 0; i < collisions.transform.childCount; i++)
-        {
-            collisions.transform.GetChild(i).gameObject.SetActive(false);
 
-        }
-        
-    }
-    IEnumerator EfectoAtaque(GameObject effect, float delay,GameObject[] plane,CollisionesArma col)
-    {
-        if(effect != null)
-        {
-			//Invoke("DevolverEfecto", currentAttack.attacks[currentComboAttack].delay);
-
-
-
-        yield return new WaitForSeconds(delay);
-
-		col.gameObject.SetActive(true);
-			Invoke("QuitarColision", 0.1f);
-
-			//effect.transform.SetParent(GuardarEffectos.transform);
-			effect.transform.localPosition = currentAttack.attacks[currentComboAttack].effectTransformPos;
-        effect.transform.localRotation = currentAttack.attacks[currentComboAttack].effectTransformRot;
-
-        effect.GetComponent<ParticleSystem>().Play();
-        energia -= currentAttack.attacks[currentComboAttack].consumoEnergia;
-        }
-
-        yield return new WaitForSeconds(0.15f);
-		//effect.transform.SetParent(GuardarEffectos.transform);
-
-		for (int i = 0; i < plane.Length;i++)
-        {
-
-            plane[i].GetComponent<DynamicMeshCutter.PlaneBehaviour>().Cut(col.GetObjects());
-            yield return new WaitForSeconds(0.1f);
-
-        }
-    }
+  
     void WalkAllDir()
     {
         anim.CrossFade("WalkBlendTree", 0.1f);
@@ -699,21 +602,6 @@ public class Player : MonoBehaviour
 
 			return;
 		}
-
-
-		if (controller.rightTrigger.wasPressedThisFrame && !attacking)
-        {
-            currentCombo = ComboFuerte;
-            currentAttack = currentCombo;
-
-		}
-        else if(controller.rightShoulder.wasPressedThisFrame && !attacking)
-		{
-			currentCombo = ComboDebil;
-			currentAttack = currentCombo;
-
-		}
-
 
 
         if(controller.xButton.wasPressedThisFrame && canHeal)
@@ -1202,100 +1090,7 @@ public class Player : MonoBehaviour
 
             }
         }
-        if (((currentAttack.attacks[currentComboAttack].Pesado == 1 && controller.rightTrigger.IsPressed()) || (currentAttack.attacks[currentComboAttack].Pesado == 0 && controller.rightShoulder.IsPressed())) && !jumping && !attacking && !dash && energia > 0 && !block && (Time.time - delayLastAttack) > 0.5f)
-        {
-            this.GetComponent<Rigidbody>().drag = 10;
-
-            timeAttack = Time.time;
-
-            attacking = true;
-            currentComboAttack = 0;
-
-
-			currentAttack = currentCombo;
-
-
-			currentAttack.attacks[currentComboAttack].attacking = true;
-            Invoke("addAttackForce", currentAttack.attacks[currentComboAttack].delayForce);
-
-            GameObject[] planeCuts = new GameObject[currentAttack.attacks[currentComboAttack].cuts.Length];
-
-            for(int i = 0; i < currentAttack.attacks[currentComboAttack].cuts.Length; i++)
-            {
-                planeCuts[i] = cuts.transform.GetChild(currentAttack.attacks[currentComboAttack].cuts[i]).gameObject;
-
-			}
-
-
-            StartCoroutine(EfectoAtaque(GetEffectByName(currentAttack.attacks[currentComboAttack].effects), currentAttack.attacks[currentComboAttack].effectDelay, planeCuts, collisions.transform.GetChild(currentAttack.attacks[currentComboAttack].col).GetComponent<CollisionesArma>()));
-            
-            anim.speed = currentAttack.attacks[currentComboAttack].animationSpeed;
-            anim.CrossFadeInFixedTime(currentAttack.attacks[currentComboAttack].name, 0.2f);
-
-            attackStartTime = Time.time;
-        }
-
-        if(attacking)
-        {
-            move = new Vector3();
-            if (currentAttack.attacks[currentComboAttack].attacking)
-            {
-                if(currentAttack.attacks[currentComboAttack].curvaDeVelocidad.length != 0)
-                {
-                    float a = Time.time - timeAttack;
-                    anim.speed = currentAttack.attacks[currentComboAttack].curvaDeVelocidad.Evaluate(a);
-                }
-
-
-
-                if ((Time.time - attackStartTime) > currentAttack.attacks[currentComboAttack].ataque)
-                {
-                    if ((Time.time - attackStartTime) < currentAttack.attacks[currentComboAttack].delay + currentAttack.attacks[currentComboAttack].ataque && currentAttack.attacks.Length != currentComboAttack +1)
-                    {
-                        if (((currentAttack.attacks[currentComboAttack+1].Pesado == 1 && controller.rightTrigger.IsPressed()) || (currentAttack.attacks[currentComboAttack+1].Pesado == 0 && controller.rightShoulder.IsPressed())) && energia > 0)
-                        {
-
-                            currentComboAttack++;
-                            Invoke("addAttackForce", currentAttack.attacks[currentComboAttack].delayForce);
-
-							//effects[0].transform.localRotation = new Quaternion();
-							//effects[0].transform.Rotate(new Vector3(0, 0, rotation2));
-
-							GameObject[] planeCuts = new GameObject[currentAttack.attacks[currentComboAttack].cuts.Length];
-
-							for (int i = 0; i < currentAttack.attacks[currentComboAttack].cuts.Length; i++)
-							{
-								planeCuts[i] = cuts.transform.GetChild(currentAttack.attacks[currentComboAttack].cuts[i]).gameObject;
-
-							}
-
-							StartCoroutine(EfectoAtaque(GetEffectByName(currentAttack.attacks[currentComboAttack].effects), currentAttack.attacks[currentComboAttack].effectDelay, planeCuts, collisions.transform.GetChild(currentAttack.attacks[currentComboAttack].col).GetComponent<CollisionesArma>()));
-                            anim.speed = currentAttack.attacks[currentComboAttack].animationSpeed;
-                            anim.CrossFadeInFixedTime(currentAttack.attacks[currentComboAttack].name, currentAttack.attacks[currentComboAttack-1].transition);
-
-
-                            attackStartTime = Time.time;
-                            currentAttack.attacks[currentComboAttack-1].attacking = false;
-                            currentAttack.attacks[currentComboAttack].attacking = true;
-
-                        }
-                    }
-                    else
-                    {
-                        delayLastAttack = Time.time;
-
-						currentAttack.attacks[currentComboAttack].attacking = false;
-                        attacking = false;
-                        anim.speed = 1;
-                        returnNormal();
-                        this.GetComponent<Rigidbody>().drag = 20;
-
-                        currentComboAttack = 0;
-
-                    }
-                }
-            }
-        }
+       
         RaycastHit hit1;
 
         if (Physics.Raycast(this.transform.GetChild(1).position, -Vector3.up, out hit1))
@@ -1332,7 +1127,7 @@ public class Player : MonoBehaviour
     }
 
 
-    void returnNormal()
+    public void returnNormal()
     {
         if (controller.leftStick.ReadValue().magnitude < 0.25f)
         {
@@ -1369,11 +1164,7 @@ public class Player : MonoBehaviour
             walk = true;
         }
     }
-    void addAttackForce()
-    {
-        this.GetComponent<Rigidbody>().AddForce(this.transform.forward * Time.fixedDeltaTime * currentAttack.attacks[currentComboAttack].force, ForceMode.Impulse);
 
-    }
     void SalirDash()
     {
         this.GetComponent<Rigidbody>().drag = 20;
@@ -1405,6 +1196,11 @@ public class Player : MonoBehaviour
 
     }
     
+    public bool CheckIfCanAttack()
+    {
+        return !jumping && !attacking && !dash && energia > 0 && !block && (Time.time - delayLastAttack) > 0.5f;
+
+	}
 
 	private void OnTriggerEnter(Collider other)
 	{
