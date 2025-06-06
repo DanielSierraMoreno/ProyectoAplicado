@@ -15,7 +15,7 @@ public class Enemy : MonoBehaviour
 	public enum States { WALK, IDLE, ATTACK, DEATH, STUN, HIT, PATROL}
 
     public States states = States.IDLE;
-	int maxHealth = 200;
+	public int maxHealth = 200;
 
 	int health = 200;
 
@@ -32,7 +32,8 @@ public class Enemy : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
     {
-        player = FindObjectOfType<Player>();
+		health = maxHealth;
+		player = FindObjectOfType<Player>();
         anim.CrossFadeInFixedTime("Idle",0.2f);
         timer = Time.time;
 
